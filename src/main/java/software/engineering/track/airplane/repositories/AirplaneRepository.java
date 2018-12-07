@@ -7,5 +7,5 @@ import software.engineering.track.airplane.models.Airplane;
 @RepositoryRestResource(path = "airplane")
 public interface AirplaneRepository extends JpaRepository<Airplane, Long> {
     Iterable<Airplane> findAllByName(String name);
-    Iterable<Airplane> findAllByRead(boolean read);
+    Iterable<Airplane> findAllByFuel(int fuel);
 }

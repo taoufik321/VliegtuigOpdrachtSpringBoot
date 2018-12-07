@@ -9,8 +9,8 @@ public class Airplane {
     @Id
     @GeneratedValue
     private long id;
-    private String name;
-    private int fuel;
+    String name;
+    int fuel;
 
     public Airplane() {
 

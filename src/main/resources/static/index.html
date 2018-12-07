@@ -42,44 +42,44 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h1>Books!</h1>
+            <h1>Airplanes:</h1>
         </div>
     </div>
     <div class="row">
         <div class="col-12">
-            <table id="books" class="table">
+            <table id="airplane" class="table">
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Year</th>
+                    <th>Fuel</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
                     <th>Name</th>
-                    <th>Year</th>
+                    <th>Fuel</th>
                 </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-    <div id="newBook" tabindex="-1" class="modal fade" role="dialog">
+    <div id="newAirplane" tabindex="-1" class="modal fade" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">New book</h4>
+                    <h4 class="modal-title">New Airplane</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="bookTitle">Name: </label><input id="bookTitle" type="text" required/>
-                        <label for="bookYear">Year: </label><input id="bookYear" type="text" required/>
+                        <label for="airplaneName">Name: </label><input id="airplaneName" type="text" required/>
+                        <label for="airplaneFuel">Fuel: </label><input id="airplaneFuel" type="text" required/>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="postData2()">Add book</button>
+                    <button type="button" class="btn btn-primary" onclick="postData()">Add plane</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -88,20 +88,20 @@
 </div>
 
 <script type="application/javascript" language="JavaScript">
-    var booksTable;
+    var airplaneTable;
     $(document).ready(
-        booksTable = function () {
-            return $('#books').DataTable({
+        airplaneTable = function () {
+            return $('#airplane').DataTable({
                 "dom": "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'B><'col-sm-12 col-md-4'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 "buttons": [
                     {
-                        "text": 'Add book',
+                        "text": 'Add airplane',
                         "className": "btn",
                         "init": function (dt, node, config) {
                             $(node[0]).attr("data-toggle", "modal");
-                            $(node[0]).attr("data-target", "#newBook");
+                            $(node[0]).attr("data-target", "#newAirplane");
                         }
                     },
                     {
@@ -109,89 +109,89 @@
                         "text": 'Toggle watched',
                         "className": "btn",
                         "action": function (e, dt, button, config) {
-                            var book = dt.data()[dt.rows({selected: true})[0]];
-                            toggleWatched2(book);
+                            var airplane = dt.data()[dt.rows({selected: true})[0]];
+                            toggleWatched2(airplane);
                         }
                     },
                     {
                         "extend": 'selected',
-                        "text": 'Delete',
+                        "text": 'Delete airplane',
                         "className": "btn btn-danger",
                         "action": function (e, dt, button, config) {
-                            var book = dt.data()[dt.rows({selected: true})[0]];
-                            deleteBook(book);
+                            var airplane = dt.data()[dt.rows({selected: true})[0]];
+                            deleteAirplane(airplane);
                         }
                     }
                 ],
                 "select": "single",
                 "ajax": {
-                    "url": "http://localhost:8080/api/book",
-                    "dataSrc": "_embedded.books"
+                    "url": "http://localhost:8080/api/airplane",
+                    "dataSrc": "_embedded.airplane"
                 },
                 "columns": [
                     {"data": "name"},
-                    {"data": "year"}
+                    {"data": "fuel"}
                 ]
             });
         }());
 
-    var getBooks = function () {
-        booksTable.ajax.reload(null, false);
+    var getAirplane = function () {
+        airplaneTable.ajax.reload(null, false);
     };
 
-    var postData2 = function () {
-        var bookTitle = $('#bookTitle').val();
-        var bookYear = $('#bookYear').val();
+    var postData = function () {
+        var airplaneName = $('#airplaneName').val();
+        var airplaneFuel = $('#airplaneFuel').val();
 
-        if (bookTitle === "") {
+        if (airplaneName === "") {
             return;
         }
         $.ajax({
-            url: "http://localhost:8080/api/book",
+            url: "http://localhost:8080/api/airplane",
             type: "post",
             data: JSON.stringify({
-                name: bookTitle,
-                year: bookYear
+                name: airplaneName,
+                fuel: airplaneFuel
             }),
             contentType: "application/json",
             success: function (result) {
-                $('#bookTitle').val("");
-                $('#newBook').modal('hide');
-                getBooks();
+                $('#airplaneName').val("");
+                $('#newAirplane').modal('hide');
+                getAirplane();
             },
             error: function (result) {
-                window.alert("Couldn't add book! " + result.responseText);
+                window.alert("Couldn't add airplane! " + result.responseText);
             }
         });
     };
 
-    var toggleWatched2 = function (book) {
+    var toggleWatched2 = function (airplane) {
         $.ajax({
-            url: book["_links"]["self"]["href"],
+            url: airplane["_links"]["self"]["href"],
             type: "patch",
             data: JSON.stringify({
-                "year": "2010"
+                "fuel": "500"
             }),
             contentType: "application/json",
             success: function (result) {
-                getBooks();
+                getAirplane();
             },
             error: function (result) {
-                window.alert("Couldn't change '" + book.name + "'! " + result.responseText);
+                window.alert("Couldn't change '" + airplane.name + "'! " + result.responseText);
             }
         });
     };
 
-    var deleteBook = function (book) {
-        if (window.confirm("Are you sure you want to delete '" + book.name + "'?")) {
+    var deleteAirplane = function (airplane) {
+        if (window.confirm("Are you sure you want to delete '" + airplane.name + "'?")) {
             $.ajax({
-                url: book["_links"]["self"]["href"],
+                url: airplane["_links"]["self"]["href"],
                 type: "delete",
                 success: function (result) {
-                    getBooks();
+                    getAirplane();
                 },
                 error: function (result) {
-                    window.alert("Couldn't delete '" + book.name + "'! " + result.responseText);
+                    window.alert("Couldn't delete '" + airplane.name + "'! " + result.responseText);
                 }
             });
         }
