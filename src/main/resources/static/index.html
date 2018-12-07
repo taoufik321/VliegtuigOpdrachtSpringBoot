@@ -2,9 +2,202 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Movies</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.bootstrap4.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/rowgroup/1.1.0/css/rowGroup.bootstrap4.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/select/1.2.6/css/select.bootstrap4.min.css"/>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/responsive/2.2.2/js/responsive.bootstrap4.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/rowgroup/1.1.0/js/dataTables.rowGroup.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/select/1.2.6/js/dataTables.select.min.js"></script>
 </head>
 <body>
+
+<!-- BODY VOOR DE Airplane -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1>Books!</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table id="books" class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div id="newBook" tabindex="-1" class="modal fade" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">New book</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="bookTitle">Name: </label><input id="bookTitle" type="text" required/>
+                        <label for="bookYear">Year: </label><input id="bookYear" type="text" required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="postData2()">Add book</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/javascript" language="JavaScript">
+    var booksTable;
+    $(document).ready(
+        booksTable = function () {
+            return $('#books').DataTable({
+                "dom": "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'B><'col-sm-12 col-md-4'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                "buttons": [
+                    {
+                        "text": 'Add book',
+                        "className": "btn",
+                        "init": function (dt, node, config) {
+                            $(node[0]).attr("data-toggle", "modal");
+                            $(node[0]).attr("data-target", "#newBook");
+                        }
+                    },
+                    {
+                        "extend": 'selected',
+                        "text": 'Toggle watched',
+                        "className": "btn",
+                        "action": function (e, dt, button, config) {
+                            var book = dt.data()[dt.rows({selected: true})[0]];
+                            toggleWatched2(book);
+                        }
+                    },
+                    {
+                        "extend": 'selected',
+                        "text": 'Delete',
+                        "className": "btn btn-danger",
+                        "action": function (e, dt, button, config) {
+                            var book = dt.data()[dt.rows({selected: true})[0]];
+                            deleteBook(book);
+                        }
+                    }
+                ],
+                "select": "single",
+                "ajax": {
+                    "url": "http://localhost:8080/api/book",
+                    "dataSrc": "_embedded.books"
+                },
+                "columns": [
+                    {"data": "name"},
+                    {"data": "year"}
+                ]
+            });
+        }());
+
+    var getBooks = function () {
+        booksTable.ajax.reload(null, false);
+    };
+
+    var postData2 = function () {
+        var bookTitle = $('#bookTitle').val();
+        var bookYear = $('#bookYear').val();
+
+        if (bookTitle === "") {
+            return;
+        }
+        $.ajax({
+            url: "http://localhost:8080/api/book",
+            type: "post",
+            data: JSON.stringify({
+                name: bookTitle,
+                year: bookYear
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                $('#bookTitle').val("");
+                $('#newBook').modal('hide');
+                getBooks();
+            },
+            error: function (result) {
+                window.alert("Couldn't add book! " + result.responseText);
+            }
+        });
+    };
+
+    var toggleWatched2 = function (book) {
+        $.ajax({
+            url: book["_links"]["self"]["href"],
+            type: "patch",
+            data: JSON.stringify({
+                "year": "2010"
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                getBooks();
+            },
+            error: function (result) {
+                window.alert("Couldn't change '" + book.name + "'! " + result.responseText);
+            }
+        });
+    };
+
+    var deleteBook = function (book) {
+        if (window.confirm("Are you sure you want to delete '" + book.name + "'?")) {
+            $.ajax({
+                url: book["_links"]["self"]["href"],
+                type: "delete",
+                success: function (result) {
+                    getBooks();
+                },
+                error: function (result) {
+                    window.alert("Couldn't delete '" + book.name + "'! " + result.responseText);
+                }
+            });
+        }
+    };
+</script>
+<!-- EINDE VAN DE BODY VAN DE Airplane -->
 
 </body>
 </html>
