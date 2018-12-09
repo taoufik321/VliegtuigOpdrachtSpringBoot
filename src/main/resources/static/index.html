@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Movies</title>
+    <title>Airplane</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">-->
@@ -63,6 +63,12 @@
             </table>
         </div>
     </div>
+
+    </br>
+    <p><i>NOTE:</i></p>
+    <p>In deze opgave is er gebruik gemaakt van de volgende standaardwaarden: </p>
+    <p>Elk vliegtuig kan maar maximaal <b>500</b> liter brandstof hebben en bij elke vlucht verbruikt het vliegtuig <b>200</b> liter brandstof.</p>
+
     <div id="newAirplane" tabindex="-1" class="modal fade" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -106,11 +112,20 @@
                     },
                     {
                         "extend": 'selected',
-                        "text": 'Toggle watched',
+                        "text": 'Fly airplane',
                         "className": "btn",
                         "action": function (e, dt, button, config) {
                             var airplane = dt.data()[dt.rows({selected: true})[0]];
-                            toggleWatched2(airplane);
+                            flyAirplane(airplane);
+                        }
+                    },
+                    {
+                        "extend": 'selected',
+                        "text": 'Fill airplane',
+                        "className": "btn",
+                        "action": function (e, dt, button, config) {
+                            var airplane = dt.data()[dt.rows({selected: true})[0]];
+                            fillAirplane(airplane);
                         }
                     },
                     {
@@ -126,7 +141,7 @@
                 "select": "single",
                 "ajax": {
                     "url": "http://localhost:8080/api/airplane",
-                    "dataSrc": "_embedded.airplane"
+                    "dataSrc": "_embedded.airplanes"
                 },
                 "columns": [
                     {"data": "name"},
@@ -146,6 +161,11 @@
         if (airplaneName === "") {
             return;
         }
+        else if (airplaneFuel > 500 || airplaneFuel < 0) {
+            window.alert("Fill a fuel value between the 0 and 500 for the airplane!");
+            return;
+        }        
+
         $.ajax({
             url: "http://localhost:8080/api/airplane",
             type: "post",
@@ -165,12 +185,36 @@
         });
     };
 
-    var toggleWatched2 = function (airplane) {
+    var fillAirplane = function (airplane) {      
         $.ajax({
             url: airplane["_links"]["self"]["href"],
             type: "patch",
             data: JSON.stringify({
                 "fuel": "500"
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                getAirplane();
+            },
+            error: function (result) {
+                window.alert("Couldn't change '" + airplane.name + "'! " + result.responseText);
+            }
+        });
+    };
+
+    var flyAirplane = function (airplane) {               
+        var airplaneFuelAfterFlying = airplane.fuel - 200;
+
+        if (airplaneFuelAfterFlying < 0) {
+            window.alert("Not enough fuel, fill the fuel first before flying the airplane!");
+            return;
+        }
+
+        $.ajax({
+            url: airplane["_links"]["self"]["href"],
+            type: "patch",
+            data: JSON.stringify({
+                "fuel": airplaneFuelAfterFlying
             }),
             contentType: "application/json",
             success: function (result) {
